@@ -63,6 +63,8 @@
 :yield
     set C, [current]
     mul C, $SIZE
+    add C, [data]
+
     set [C], POP ; store thread's return PC
     ; store thread registers
     set [C + 1], X
