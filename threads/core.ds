@@ -76,6 +76,7 @@
         set [current], 0
     set C, [current]
     mul C, $SIZE
+    add C, [data]
     ; load registers
     set X, [C + 1]
     set Y, [C + 2]
