@@ -1,6 +1,6 @@
 # cooperative threading for DCPU16
 
-This is a basic implementation of a cooperative thread model for DCPU16. The code compiles on common assemblers, and includes a simple example program at the top of the core.ds file. It runs a main thread that launches a second (then later third) third. The threads simple increment their local I register, and display the current thread "type" (1 or 2) on the screen (i.e. write the character to 0x8000). If you're watching memory as the program runs, you can see the incrementing I registers near the end of memory (on the stack).
+This is a basic implementation of a cooperative thread model for DCPU16. The code compiles on common assemblers, and includes a simple example program at the top of the core.ds file. It runs a main thread that launches a second (then later third) thread. The threads simply increment their local I register, and display the current thread "type" (1 or 2) on the screen (i.e. write the character to 0x8000). If you're watching memory as the program runs, you can see the incrementing I registers near the end of memory (on the stack).
 
 ## Notes
 
