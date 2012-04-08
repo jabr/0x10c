@@ -43,27 +43,39 @@
         </dict>
         <dict>
             <key>match</key>
-            <string>\b(set|add|sub|mul|div|mod|shl|shr|and|bor|xor|ife|ifn|ifg|ifb|jsr|dat)\b</string>
+            <string>(?i)\b(set|add|sub|mul|div|mod|shl|shr|and|bor|xor|ife|ifn|ifg|ifb|jsr|dat|brk)\b</string>
             <key>name</key>
             <string>keyword.mnemonic</string>
         </dict>
         <dict>
             <key>match</key>
-            <string>^\S+:</string>
+            <string>(?i)\b(push|pop)\b</string>
+            <key>name</key>
+            <string>keyword.other</string>
+        </dict>
+        <dict>
+            <key>match</key>
+            <string>^\s*\S+:</string>
             <key>name</key>
             <string>entity.name.label</string>
         </dict>
         <dict>
             <key>match</key>
-            <string>^:\S+\b</string>
+            <string>^\s*:\S+\b</string>
             <key>name</key>
             <string>entity.name.label</string>
         </dict>
         <dict>
             <key>match</key>
-            <string>\$[0-9a-f]+\b</string>
+            <string>\#define</string>
             <key>name</key>
-            <string>constant.numeric.literal</string>
+            <string>meta.preprocessor.c</string>
+        </dict>
+        <dict>
+            <key>match</key>
+            <string>\$\S+\b</string>
+            <key>name</key>
+            <string>meta.preprocessor.c</string>
         </dict>
         <dict>
             <key>match</key>
