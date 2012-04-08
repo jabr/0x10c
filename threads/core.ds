@@ -1,25 +1,37 @@
 ; example
 
 :main
-    set A, 2 ; max number of threads
+    set A, 3 ; max number of threads
     set B, first
     jsr init
-    brk
+    set PC, PC
 
 :first
+    jsr create_another_thread
+
+    set I, 0
+    :first_loop
+        set [0x8000], 0x31
+        ife I, 1000
+            jsr create_another_thread
+        add I, 1
+
+    jsr yield
+    set PC, first_loop
+
+:create_another_thread
     set A, second
     jsr create
-
-    ::loop
-    ; do something
-    jsr yield
-    set PC, loop
+    set PC, POP
 
 :second
-    ::loop
-    ; do something
+    set I, 0
+    :second_loop
+        set [0x8000], 0x32
+        add I, 1
+
     jsr yield
-    set PC, loop
+    set PC, second_loop
 
 ; thread implementation
 
@@ -29,13 +41,12 @@
 :max        dat 0
 :current    dat 0
 
-#define $SIZE 6
 ; thread data (on stack): [PC, X, Y, Z, I, J]+
 
 :init ; (max threads, main thread entry point)
     set [stack], SP
     set [max], A
-    set C, $SIZE
+    set C, 6
     mul C, A
     sub SP, C
     set [data], SP
@@ -54,7 +65,7 @@
     set B, [count]
     add [count], 1
     set C, B
-    mul C, $SIZE
+    mul C, 6
     add C, [data]
     set [C], A
     set A, B
@@ -62,7 +73,7 @@
 
 :yield
     set C, [current]
-    mul C, $SIZE
+    mul C, 6
     add C, [data]
 
     set [C], POP ; store thread's return PC
@@ -77,7 +88,7 @@
     ife [current], [count]
         set [current], 0
     set C, [current]
-    mul C, $SIZE
+    mul C, 6
     add C, [data]
     ; load registers
     set X, [C + 1]
