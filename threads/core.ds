@@ -1,0 +1,86 @@
+; example
+
+:main
+    set A, 2 ; max number of threads
+    set B, first
+    jsr init
+    brk
+
+:first
+    set A, second
+    jsr create
+
+    ::loop
+    ; do something
+    jsr yield
+    set PC, loop
+
+:second
+    ::loop
+    ; do something
+    jsr yield
+    set PC, loop
+
+; thread implementation
+
+:stack      dat 0
+:data       dat 0
+:count      dat 0
+:max        dat 0
+:current    dat 0
+
+#define $SIZE 6
+; thread data (on stack): [PC, X, Y, Z, I, J]+
+
+:init ; (max threads, main thread entry point)
+    set [stack], SP
+    set [max], A
+    set C, $SIZE
+    mul C, A
+    sub SP, C
+    set [data], SP
+    set [count], 1
+    jsr B ; enter main thread
+    set SP, [stack]
+    set PC, POP
+
+:fail
+    set A, 0xffff
+    set PC, POP
+
+:create ; (thread entry point)
+    ife [count], [max]
+        set PC, fail
+    set B, [count]
+    add [count], 1
+    set C, B
+    mul C, $SIZE
+    add C, [data]
+    set [C], A
+    set A, B
+    set PC, POP
+
+:yield
+    set C, [current]
+    mul C, $SIZE
+    set [C], POP ; store thread's return PC
+    ; store thread registers
+    set [C + 1], X
+    set [C + 2], Y
+    set [C + 3], Z
+    set [C + 4], I
+    set [C + 5], J
+    ; move on to the next thread
+    add [current], 1
+    ife [current], [count]
+        set [current], 0
+    set C, [current]
+    mul C, $SIZE
+    ; load registers
+    set X, [C + 1]
+    set Y, [C + 2]
+    set Z, [C + 3]
+    set I, [C + 4]
+    set J, [C + 5]
+    ; resume thread
+    set PC, [C]
