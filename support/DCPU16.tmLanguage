@@ -4,9 +4,9 @@
 <dict>
     <key>fileTypes</key>
     <array>
-        <string>ds</string>
-        <string>dasm</string>
         <string>dasm16</string>
+        <string>dasm</string>
+        <string>ds</string>
         <string>s</string>
     </array>
     <key>name</key>
