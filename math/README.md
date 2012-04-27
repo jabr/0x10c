@@ -14,24 +14,21 @@ Basic arithmetic implementation should be simple and small; performance similar 
 
 ### Todo
 
-Comparison functions: generally a few branching ops
-ceil/floor: Branch on sign, then?
-mod
-remainder
-abs: a hardware AND
-inverse ?
-flip: hardware XOR
-constructor from base 10 ?
-  needs log and exp
-String format ?
-
-Macro support for simple ops?
+* Comparison functions: generally a few branching ops
+* ceil/floor: Branch on sign, then?
+* mod/remainder
+* abs: a hardware AND
+* inverse ?
+* flip: hardware XOR
+* constructor from base 10 ? ()needs log and exp)
+* String format ?
+* macro support for simple ops?
 
 ## math library
 
 ### Transcendentals
 
-*** NOTE: The maths module (named to avoid conflict with the built-in math python module) is even more of a proof of concept. It currently uses python native floats, as I'm still working on the basic logic. A version using DCPU floats is coming soon.***
+*** NOTE: The maths module (named to avoid conflict with the built-in math Python module) is even more of a proof of concept. It currently uses Python native floats, as I'm still working on the basic logic. A version using DCPU floats is coming soon.***
 
 Anyway, most functions are based on the cordic algorithm. The core loop does 16 iterations on this simple logic:
 
@@ -43,23 +40,22 @@ Anyway, most functions are based on the cordic algorithm. The core loop does 16 
 
 `x, y, z` are fp numbers, and e is a lookup table of 16 fp numbers. Shifts on fps are a hardware SUB, and sign flipping on fps is a hardware XOR. Then there are three fp adds/subs.
 
-sin/cos simultaneously in one cordic call.
-tan adds a fp div on the sincos call
+#### Notes
 
-atan in one cordic.
-2D hypot in one cordic, one fp mul.
+* sin/cos simultaneously in one cordic call.
+* tan adds an fp div on the sincos call
+* atan in one cordic.
+* 2D hypot in one cordic, one fp mul.
+* atan2 is variable, some branching and generally one cordic, one fp div, and one fp add/sub when y is negative. no fp ops when x is 0.
+* 2D cartesian to polar transform is one cordic, one fp mul, some branching, and one fp add/sub when x is negative.
 
-atan2 is variable, some branching and generally one cordic, one fp div, and one fp add/sub when y is negative. no fp ops when x is 0.
+##### Hyperbolics
 
-2D cartesian to polar transform is one cordic, one fp mul, some branching, and one fp add/sub when x is negative.
+Limited domain `exp, log, sqrt` in one cordic (though a 21 iteration version), one fp mul or add. It should be possible to expand the domain for `exp/log` with an additional fp mul and add.
 
-Limited domain exp, log, sqrt in one cordic (though a 21 iteration version), one fp mul or add.
+### Other functions
 
-It should be possible to expand the domain for exp/log with an additional fp mul and add.
-
-## Other functions
-
-A more robust sqrt using Newton's Iteration:
+A more robust `sqrt` using Newton's Iteration:
 
 Variable number of iterations of:
 `k = (k + n/k) >> 1`
@@ -68,7 +64,7 @@ One fp div and add, plus a hardware SUB.
 
 Iteration count is either fixed (parameter) or loops until convergence using a fp sub (and fp abs - a hardware AND).
 
-## In search of better exp/log
+## In search of better hyperbolics (sqrt/exp/log)
 
 Can we use the cordic functions in a broader range?
 
@@ -76,5 +72,5 @@ If not, is there a different approach to approximating these functions?
 
 # Contributing
 
-Pull requests are very welcome!
+MIT license. Pull requests are very welcome!
 
