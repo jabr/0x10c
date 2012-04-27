@@ -68,7 +68,7 @@ Iteration count is either fixed (parameter) or loops until convergence using a f
 
 Can we use the cordic functions in a broader range?
 
-If not, is there a different approach to approximating these functions?
+If not, is there a different, more efficient approach to approximating these functions?
 
 # Contributing
 
