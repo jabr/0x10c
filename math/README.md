@@ -6,11 +6,11 @@
 
 To avoid the overhead of bit-packing, I don't use any IEEE standard format. Instead, the numbers consist of two signed words. The first contains the mantissa/significand and the second the exponent.
 
-The mantissa represents a fraction between -1 and 1. It's "value" is effectively `mantissa/32767`. The exponent is also signed (no basis), and represents a range from 2^(-32768) to 2^32766. 2^32767 (0x7fff) is a special case (infinity and NaN). This gives us a precision of ~3x10^(-5), and a ridiculous range of ~10^9863.
+The mantissa represents a fraction between -1 and 1. Its "value" is effectively `mantissa/32767`. The exponent is also signed (no basis), and represents a range from 2^(-32768) to 2^32766. 2^32767 (0x7fff) is a special case (infinity and NaN). This gives us a precision of ~3x10^(-5), and a ridiculous range of ~10^9863.
 
 Exponent 0x7fff is a special case: if the mantissa is 0, it means NaN; otherwise, it represents infinity with the sign from the mantissa.
 
-Basic arithmetic implementation should be simple and small; performance similar to a two word fixed point approach.
+The rough dasm16 implementation of basic arithmetic is simple and short; performance is very similar to a two word fixed point approach.
 
 ### Todo
 
@@ -19,10 +19,10 @@ Basic arithmetic implementation should be simple and small; performance similar 
 * mod/remainder
 * abs: a hardware AND
 * inverse ?
-* flip: hardware XOR
-* constructor from base 10 ? ()needs log and exp)
-* String format ?
-* macro support for simple ops?
+* flip ?: hardware XOR
+* constructor from base 10 ? (needs log and exp)
+* string format ?
+* assembler macro support for simple ops?
 
 ## math library
 
@@ -30,7 +30,7 @@ Basic arithmetic implementation should be simple and small; performance similar 
 
 *** NOTE: The maths module (named to avoid conflict with the built-in math Python module) is even more of a proof of concept. It currently uses Python native floats, as I'm still working on the basic logic. A version using DCPU floats is coming soon.***
 
-Anyway, most functions are based on the cordic algorithm. The core loop does 16 iterations on this simple logic:
+Anyway, most functions are based on the cordic algorithm. The core loop does 16 iterations of this inner loop:
 
     sign = z < 0 ? -1 : 1
     xt = x + sign * y >> i
