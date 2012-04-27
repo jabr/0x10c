@@ -1,6 +1,6 @@
 # Math library for DCPU16
 
-***NOTE: This is still in the R&D phase, and I have not yet implemented any of it in assembly. The initial prototypes are in Python, but they are designed to be efficiently portable to the DCPU.***
+***NOTE: This is still in the R&D phase, and I have not yet released a DCPU assembly version of this work. The initial prototypes are in Python, and they are designed to be efficiently portable to the DCPU.***
 
 ## floating point numbers
 
@@ -28,7 +28,7 @@ The rough dasm16 implementation of basic arithmetic is simple and short; perform
 
 ### Transcendentals
 
-*** NOTE: The maths module (named to avoid conflict with the built-in math Python module) is even more of a proof of concept. It currently uses Python native floats, as I'm still working on the basic logic. A version using DCPU floats is coming soon.***
+***NOTE: The maths module (named to avoid conflict with the built-in math Python module) is even more of a proof of concept. It currently uses Python native floats, as I'm still working on the basic logic. A version using my DCPU floats is coming soon.***
 
 Anyway, most functions are based on the cordic algorithm. The core loop does 16 iterations of this inner loop:
 
