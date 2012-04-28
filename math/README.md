@@ -6,7 +6,7 @@
 
 To avoid the overhead of bit-packing, I don't use any IEEE standard format. Instead, the numbers consist of two signed words. The first contains the mantissa/significand and the second the exponent.
 
-The mantissa represents a fraction between -1 and 1. Its "value" is effectively `mantissa/32767`. The exponent is also signed (no basis), and represents a range from 2^(-32768) to 2^32766. 2^32767 (0x7fff) is a special case (infinity and NaN). This gives us a precision of ~3x10^(-5), and a ridiculous range of ~10^9863.
+The mantissa represents a fraction between -2 and 2. Its "value" is effectively `mantissa/16384`. The exponent is also signed (no basis), and represents a range from 2^(-32768) to 2^32766. 2^32767 (0x7fff) is a special case (infinity and NaN). This gives us a precision of ~6x10^(-5), and a ridiculous range of ~10^9863.
 
 Exponent 0x7fff is a special case: if the mantissa is 0, it means NaN; otherwise, it represents infinity with the sign from the mantissa.
 
@@ -15,11 +15,11 @@ The rough dasm16 implementation of basic arithmetic is simple and short; perform
 ### Todo
 
 * Comparison functions: generally a few branching ops
-* ceil/floor: Branch on sign, then?
+* ceil/floor
 * mod/remainder
-* abs: a hardware AND
-* inverse ?
-* flip ?: hardware XOR
+* abs
+* inverse
+* negate: hardware MLI (-32768 case?)
 * constructor from base 10 ? (needs log and exp)
 * string format ?
 * assembler macro support for simple ops?
@@ -38,7 +38,7 @@ Anyway, most functions are based on the cordic algorithm. The core loop does 16 
     z = z - sign * e[i]
     x = xt
 
-`x, y, z` are fp numbers, and e is a lookup table of 16 fp numbers. Shifts on fps are a hardware SUB, and sign flipping on fps is a hardware XOR. Then there are three fp adds/subs.
+`x, y, z` are fp numbers, and e is a lookup table of 16 fp numbers. Shifts on fps are a hardware SUB, and sign flipping on fps is a hardware MLI. Then there are three fp adds/subs.
 
 #### Notes
 

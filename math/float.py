@@ -10,7 +10,7 @@ def to(v):
         e = int(math.ceil(math.log(math.fabs(v), 2)))
     except:
         e = 0
-    s = int((v / math.pow(2, e)) * 0x7fff)
+    s = int(math.ceil((v / math.pow(2, e)) * 0x7fff))
     return (s, e)
 
 def normalize(f, e):
@@ -85,7 +85,11 @@ conversion_details(a)
 conversion_details(b)
 
 def number_details(af, ae):
-    print "{}b{} = {}".format(af, ae, to_float(af, ae))
+    print "{}b{} = {}\n = {:04x} {:04x} = {:016b} {:016b}".format(
+        af, ae, to_float(af, ae),
+        af & 0xffff, ae & 0xffff,
+        af & 0xffff, ae & 0xffff,
+    )
 
 print "\n"
 
