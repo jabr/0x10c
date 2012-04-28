@@ -45,25 +45,25 @@
         </dict>
         <dict>
             <key>match</key>
-            <string>(?i)\b(set|add|sub|mul|div|mod|shl|shr|and|bor|xor|ife|ifn|ifg|ifb|jsr|dat|brk)\b</string>
+            <string>(?i)\b(set|add|sub|mul|mli|div|dvi|mod|mdi|and|bor|xor|shr|asr|shl|ifb|ifc|ife|ifn|ifg|ifa|ifl|ifu|adx|sbx|sti|std|jsr|hcf|int|iag|ias|rfi|iaq|hwn|hwq|hwi|dat|brk|bra|ret|jmp)\b</string>
             <key>name</key>
             <string>keyword.mnemonic</string>
         </dict>
         <dict>
             <key>match</key>
-            <string>(?i)\b(push|pop)\b</string>
+            <string>(?i)\b(push|pop|peek|pick)\b</string>
             <key>name</key>
             <string>keyword.other</string>
         </dict>
         <dict>
             <key>match</key>
-            <string>^\s*\S+:</string>
+            <string>^\s*[\w\.]+:</string>
             <key>name</key>
             <string>entity.name.label</string>
         </dict>
         <dict>
             <key>match</key>
-            <string>^\s*:\S+\b</string>
+            <string>^\s*:[\w\.]+\b</string>
             <key>name</key>
             <string>entity.name.label</string>
         </dict>
@@ -81,7 +81,7 @@
         </dict>
         <dict>
             <key>match</key>
-            <string>\b[0-9]+\b</string>
+            <string>\b\-?[0-9]+\b</string>
             <key>name</key>
             <string>constant.numeric.dec</string>
         </dict>
@@ -93,13 +93,13 @@
         </dict>
         <dict>
             <key>match</key>
-            <string>(?i)\b(A|B|C|X|Y|Z|I|J|SP|PC|O)+\b</string>
+            <string>(?i)\b(A|B|C|X|Y|Z|I|J|PC|SP|EX|IA|O)+\b</string>
             <key>name</key>
             <string>storage.register</string>
         </dict>
         <dict>
             <key>match</key>
-            <string>\b\S+\b</string>
+            <string>\b[\w\.]+\b</string>
             <key>name</key>
             <string>entity.name.label</string>
         </dict>
