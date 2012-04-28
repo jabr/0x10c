@@ -6,7 +6,7 @@
 
 To avoid the overhead of bit-packing, I don't use any IEEE standard format. Instead, the numbers consist of two signed words. The first contains the mantissa/significand and the second the exponent.
 
-The mantissa represents a fraction between -2 and 2. Its "value" is effectively `mantissa/16384`. The exponent is also signed (no basis), and represents a range from 2^(-32768) to 2^32766. 2^32767 (0x7fff) is a special case (infinity and NaN). This gives us a precision of ~6x10^(-5), and a ridiculous range of ~10^9863.
+The mantissa represents a fraction between -2 and 2. Its "value" is effectively `mantissa/32768`. For performance, we can't use the leading 1 assumption, so the mantissa is effectively 14 bits with 15 bits of precision. The exponent is also signed (no basis), and represents a range from 2^(-32768) to 2^32766. 2^32767 (0x7fff) is a special case (infinity and NaN). This gives us a precision of ~3x10^(-5), and a ridiculous range of ~10^9863.
 
 Exponent 0x7fff is a special case: if the mantissa is 0, it means NaN; otherwise, it represents infinity with the sign from the mantissa.
 
