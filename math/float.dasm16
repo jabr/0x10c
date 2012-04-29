@@ -1,12 +1,13 @@
 bra main
 
-:count dat 0x0000, 0x0000
+:count dat 0x0000
 
 :d_3   dat 0x6000, 0x0002
 :d_5   dat 0x5000, 0x0003
-:d_0.6 dat 0x4ccc, 0x0000
 :d_8   dat 0x4000, 0x0004
 :d_n2  dat 0xe000, 0x0003
+:d_15  dat 0x7800, 0x0004
+:d_0.6 dat 0x4ccc, 0x0000
 
 dat p"xx"
 :out dat 0,0, 0,0, 0,0, 0,0
@@ -18,37 +19,67 @@ dat p"xx"
     set X, [d_3+1]
     set B, [d_5+0]
     set Y, [d_5+1]
-    jsr div
-    sti [I], C
-    sti [I], Z
     jsr add
     sti [I], C
     sti [I], Z
     jsr sub
+    sti [I], C
+    sti [I], Z
+    jsr mul
+    sti [I], C
+    sti [I], Z
+    jsr div
     sti [I], C
     sti [I], Z
     brk
 
 :benchmark
-    set A, [d_3+0]
-    set X, [d_3+1]
-    set B, [d_5+0]
-    set Y, [d_5+1]
     jsr add
     jsr sub
+    jsr mul
     jsr div
     add [count], 1
-    adx [count+1], 0
     ife EX, 0
         bra benchmark
     brk
 
-:add
-    ; AX + BY -> CZ
+; arithmetic
+
+; todo: change exponents to be unsigned with basis
+; todo: detect exponent overflow and return +/- infinity
+; todo: test for and propagate NaN and infinities
+
+:normalize
+    ife Z, 0x8000
+        bra return_zero
+
+    set I, C
+    and I, 0x8000 ; remember sign
+    shl C, 1
+    bor C, I
+    shl J, 1 ; pull a bit from our truncated result
+    bor C, EX
+    sub Z, 1
+
+:normalize_test
+    ifn C, 0 ; if C is not zero and C's second bit is not set
+    ifc C, 0x4000
+        bra normalize
+
+    set J, pop
+    set I, pop
+    ret
+
+:return_zero
+    set C, 0
+    set Z, 0
+    set J, pop
+    set I, pop
+    ret
+
+:add ; AX + BY -> CZ
     set push, I
     set push, J
-
-; todo: overflow on signed add/sub
 
     ifu X, Y
         bra add_bigger_b
@@ -60,9 +91,10 @@ dat p"xx"
 
     set C, B
     asr C, I
+    set J, EX ; keep truncated bits in case shift we shift left during normalization
     add C, A
 
-    bra add_end
+    bra add_check_sign
 
 :add_bigger_b
     set Z, Y
@@ -72,27 +104,67 @@ dat p"xx"
 
     set C, A
     asr C, I
+    set J, EX ; keep truncated bits in case shift we shift left during normalization
     add C, B
 
-:add_end
-    set J, pop
-    set I, pop
-    ret
+:add_check_sign
+    ifc B, 0x8000 ; if B is positive and C < A
+    ifu C, A
+        bra add_fix_sign_overflow
+    ifc B, 0x8000 ; if B is negative and C > A
+    ifa C, A
+        bra add_fix_sign_underflow
 
-:sub
-    ; AX - BY -> CZ
+    ; relative jump to normalize_test
+    sub PC, 2 + . - normalize_test
+
+:add_fix_sign_overflow
+    shr C, 1
+    add Z, 1
+    ; relative jump to normalize_test
+    sub PC, 2 + . - normalize_test
+
+:add_fix_sign_underflow
+    shr C, 1
+    bor C, 0x8000
+    add Z, 1
+    ; relative jump to normalize_test
+    sub PC, 2 + . - normalize_test
+
+:sub ; AX - BY -> CZ
     set push, B
+    ; handle case where B is -32768, as mli -32768, -1 == -32768
+    ife B, 0x8000
+        add B, 1
     mli B, -1
     jsr add
     set B, pop
     ret
 
-:div
-    ; AX / BY -> CZ
+:mul ; AX * BY -> CZ
+    set push, I
+    set push, J
+
+    set Z, X
+    add Z, Y
+
+    set C, A
+    mli C, B
+    set I, EX
+    shl I, 1
+    shr C, 15
+    set J, EX ; save these bits in case we shift left during normalization
+    bor C, I
+
+    ; relative jump to normalize_test
+    sub PC, 2 + . - normalize_test
+
+:div ; AX / BY -> CZ
     ife B, 0
         bra return_nan
 
     set push, I
+    set push, J
 
     set Z, X
     sub Z, Y
@@ -101,22 +173,26 @@ dat p"xx"
     dvi I, B
     set C, EX
     asr C, 1
+    set J, EX ; keep this bit in case we shift left during normalization
 
     ife I, 0
-        bra div_end
+        ; relative jump to normalize_test
+        sub PC, 2 + . - normalize_test
 
     add Z, 1
     asr C, 1
     bor C, 0x4000
 
-:div_end
-    set I, POP
-    ret
+    ; relative jump to normalize_test
+    sub PC, 2 + . - normalize_test
 
 :return_nan
     set C, 0
     set Z, 0x7fff
+    ; branched to before I/J pushed, so no need to pop
     ret
+
+; library
 
 :sqrt
     ; sqrt(AX) -> CZ
