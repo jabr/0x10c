@@ -14,9 +14,14 @@ def to(v):
     return (s, e)
 
 def normalize(f, e):
-    if (abs(f) > 0x7fff):
+    while abs(f) > 0x7fff:
         f >>= 1
         e += 1
+
+    while abs(f) < 0x4000:
+        f <<= 1
+        e -= 1
+
     if (e < -0x7fff):
         f = e = 0
     if (e >= 0x7fff):
