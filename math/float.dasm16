@@ -1,7 +1,12 @@
-bra main
+jmp main
 
 :count dat 0x0000
 
+:pi      dat 0x6488, 0x0002
+:half_pi dat 0x6488, 0x0001
+:sqrt_2  dat 0x5a82, 0x0001
+
+:d_2   dat 0x7fff, 0x0001
 :d_3   dat 0x6000, 0x0002
 :d_5   dat 0x5000, 0x0003
 :d_8   dat 0x4000, 0x0004
@@ -11,26 +16,40 @@ bra main
 
 dat p"xx"
 :out dat 0,0, 0,0, 0,0, 0,0
+     dat 0,0
 dat p"xx"
 
 :main
     set I, out
+
     set A, [d_3+0]
     set X, [d_3+1]
     set B, [d_5+0]
     set Y, [d_5+1]
+
     jsr add
     sti [I], C
     sti [I], Z
+
     jsr sub
     sti [I], C
     sti [I], Z
+
     jsr mul
     sti [I], C
     sti [I], Z
+
     jsr div
     sti [I], C
     sti [I], Z
+
+    set A, [d_2+0]
+    set X, [d_2+1]
+
+    jsr sqrt
+    sti [I], C
+    sti [I], Z
+
     brk
 
 :benchmark
@@ -44,6 +63,8 @@ dat p"xx"
     brk
 
 ; arithmetic
+
+; todo: seems to be some bugs with mixed signs - mul seems to be ok
 
 ; todo: change exponents to be unsigned with basis
 ; todo: detect exponent overflow and return +/- infinity

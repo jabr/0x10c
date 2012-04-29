@@ -75,6 +75,8 @@ def div(a, b):
     return normalize(int(mf), me)
 
 def to_float(af, ae):
+    if (af > 0x7fff):
+        af = -(0xffff - af)
     return (af / 0x7fff) * math.pow(2, ae)
 
 def conversion_details(a):
