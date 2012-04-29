@@ -6,6 +6,7 @@ jmp main
 :half_pi dat 0x6488, 0x0001
 :sqrt_2  dat 0x5a82, 0x0001
 
+:d_1   dat 0x7fff, 0x0000
 :d_2   dat 0x7fff, 0x0001
 :d_3   dat 0x6000, 0x0002
 :d_5   dat 0x5000, 0x0003
@@ -174,7 +175,7 @@ dat p"xx"
     ; handle case where B is -32768, as mli -32768, -1 == -32768
     ife B, 0x8000
         add B, 1
-    mli B, -1
+    mli B, 0xffff
     jsr add
     set B, pop
     ret
@@ -232,8 +233,40 @@ dat p"xx"
 
 ; library
 
-:sqrt
-    ; sqrt(AX) -> CZ
+:sqrt ; sqrt(AX) -> CZ
     ; using Newton's Iteration:
     ; k = (k + n/k) / 2
+
+    set push, I
+    set push, J
+
+    ; store n
+    set I, A
+    set J, X
+
+    ; k starts at 1
+    set C, [d_1+0]
+    set Z, [d_1+1]
+
+:sqrt_loop
+    set A, I ; n
+    set X, J
+    set B, C ; k
+    set Y, Z
+    jsr div ; n/k
+
+    set A, C ; n/k
+    set X, Z
+    jsr add ; n/k + k
+
+    sub Z, 1 ; (k + n/k) / 2
+
+    ife B, C
+    ife Y, Z
+        bra sqrt_done
+    bra sqrt_loop
+
+:sqrt_done
+    set J, pop
+    set I, pop
     ret
